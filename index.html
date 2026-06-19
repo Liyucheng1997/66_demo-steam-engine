@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>蒸汽机原理三维演示 · Steam Engine</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- 顶部标题 -->
+  <header id="title">
+    <h1>蒸汽机工作原理三维演示</h1>
+    <p>双作用往复式蒸汽机 · 热能 → 机械能</p>
+  </header>
+
+  <!-- 左侧讲解面板 -->
+  <aside id="panel">
+    <div class="panel-tabs">
+      <button class="tab active" data-tab="how">工作原理</button>
+      <button class="tab" data-tab="parts">主要部件</button>
+      <button class="tab" data-tab="cycle">四个冲程</button>
+    </div>
+
+    <div class="panel-body">
+      <section class="tab-content active" data-tab="how">
+        <h2>它如何产生推动力？</h2>
+        <p>蒸汽机把<b>燃料燃烧的热能</b>转化为<b>机械能</b>，核心是“高压蒸汽推动活塞”这一步。</p>
+        <ol>
+          <li><b>烧水产汽</b>：锅炉加热产生高温高压蒸汽。</li>
+          <li><b>蒸汽配气</b>：滑阀把蒸汽轮流送入气缸的左、右两端。</li>
+          <li><b>推动活塞</b>：高压蒸汽膨胀，推动活塞做<b>直线往复</b>运动——这就是动力的来源。</li>
+          <li><b>变成旋转</b>：连杆 + 曲柄把直线运动变成<b>旋转</b>运动。</li>
+          <li><b>飞轮稳速</b>：飞轮储存动能，越过死点、使转动平稳连续。</li>
+        </ol>
+        <p class="tip">推动力本质：<b>F = 蒸汽压强 p × 活塞面积 A</b>。压强越高、活塞越大，推力越大。</p>
+      </section>
+
+      <section class="tab-content" data-tab="parts">
+        <h2>主要部件</h2>
+        <ul class="parts-list">
+          <li><span class="dot c-boiler"></span><b>锅炉</b>：燃料加热水，产生高压蒸汽。</li>
+          <li><span class="dot c-cyl"></span><b>气缸</b>：蒸汽在此膨胀做功的密闭空间。</li>
+          <li><span class="dot c-piston"></span><b>活塞</b>：被蒸汽推动，做直线往复运动。</li>
+          <li><span class="dot c-valve"></span><b>滑阀</b>：配气机构，控制蒸汽进出气缸两端。</li>
+          <li><span class="dot c-rod"></span><b>连杆</b>：连接活塞与曲柄，传递力。</li>
+          <li><span class="dot c-crank"></span><b>曲轴/曲柄</b>：把往复直线运动转成旋转。</li>
+          <li><span class="dot c-fly"></span><b>飞轮</b>：储能稳速，保证连续运转。</li>
+          <li><span class="dot" style="background:#d9a441"></span><b>偏心轮</b>：装在曲轴上，通过偏心杆驱动滑阀，实现自动配气。</li>
+          <li><span class="dot" style="background:#06d6a0"></span><b>离心调速器</b>：转快→飞球张开→关小进汽，自动稳定转速（瓦特反馈机构）。</li>
+        </ul>
+        <p class="tip">点击右下角“分解视图”可拉开部件，看清它们的连接关系。</p>
+      </section>
+
+      <section class="tab-content" data-tab="cycle">
+        <h2>双作用循环</h2>
+        <p>“双作用”指蒸汽<b>交替</b>推动活塞两端，往复都做功，效率更高。</p>
+        <ol>
+          <li><b>进汽</b>：滑阀打开一端，高压蒸汽进入。</li>
+          <li><b>膨胀做功</b>：蒸汽膨胀，推动活塞向另一端运动。</li>
+          <li><b>排汽</b>：活塞另一端的废汽经滑阀排出。</li>
+          <li><b>换向</b>：滑阀移动，进汽与排汽两端互换，反向推动。</li>
+        </ol>
+        <p class="tip">当前进汽侧会以<span style="color:#ff6b6b">红色高亮</span>显示，废汽以蓝色显示。</p>
+      </section>
+    </div>
+  </aside>
+
+  <!-- 右下角控制台 -->
+  <div id="controls">
+    <button id="btn-play" class="ctrl">⏸ 暂停</button>
+    <div class="ctrl-row">
+      <label>转速</label>
+      <input id="speed" type="range" min="0" max="3" step="0.05" value="1" />
+    </div>
+    <button id="btn-steam" class="ctrl">🌫 蒸汽：开</button>
+    <button id="btn-explode" class="ctrl">🧩 分解视图</button>
+    <button id="btn-section" class="ctrl">🔪 剖切气缸</button>
+    <button id="btn-view" class="ctrl">🎥 复位视角</button>
+  </div>
+
+  <!-- 右上角仪表 HUD -->
+  <div id="hud">
+    <canvas id="dial" width="150" height="150"></canvas>
+    <div class="hud-readout">
+      <div class="hud-row"><span>转速</span><b id="hud-rpm">0</b><i>r/min</i></div>
+      <div class="hud-row"><span>曲柄角</span><b id="hud-deg">0°</b></div>
+      <div class="hud-stroke" id="hud-stroke">— 已暂停 —</div>
+      <div class="hud-legend">
+        <span><i class="sw red"></i>进汽 / 做功侧</span>
+        <span><i class="sw blue"></i>排汽侧</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 浮动标签层 -->
+  <div id="labels"></div>
+
+  <!-- 部件信息提示 -->
+  <div id="hint">提示：拖动旋转 · 滚轮缩放 · 右键平移。把鼠标移到部件上可查看名称。</div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
