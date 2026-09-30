@@ -3,111 +3,228 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>蒸汽机原理三维演示 · Steam Engine</title>
+<title>蒸汽机原理 · 交互式三维教学</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="app"></div>
+  <div id="labels"></div>
+  <div id="tooltip"></div>
 
-  <!-- 顶部标题 -->
-  <header id="title">
-    <h1>蒸汽机工作原理三维演示</h1>
-    <p>双作用往复式蒸汽机 · 热能 → 机械能</p>
+  <!-- 载入 -->
+  <div id="loading">
+    <div class="load-box">
+      <div class="load-title">蒸汽机 · 工作原理</div>
+      <div class="load-bar"><i id="load-fill"></i></div>
+      <div class="load-msg" id="load-msg">正在加载三维引擎…</div>
+    </div>
+  </div>
+
+  <!-- 顶栏 -->
+  <header id="topbar">
+    <div class="brand">
+      <div class="brand-mark">⚙</div>
+      <div>
+        <h1>蒸汽机工作原理</h1>
+        <p>卧式单缸双作用蒸汽机 · 机车式火管锅炉 · 瓦特离心调速器</p>
+      </div>
+    </div>
+    <nav class="toolbar">
+      <button class="tb primary" id="btn-tour" title="分步讲解整台机器的工作过程">▶ 开始导览</button>
+      <span class="sep"></span>
+      <button class="tb toggle" id="btn-sec-engine" title="水平剖开气缸与阀箱，查看汽道、滑阀与活塞">剖视气缸</button>
+      <button class="tb toggle" id="btn-sec-boiler" title="剖开锅炉，查看火箱、火管与水">剖视锅炉</button>
+      <button class="tb toggle" id="btn-explode" title="把部件沿装配方向拉开">分解</button>
+      <span class="sep"></span>
+      <button class="tb toggle on" id="btn-labels">标签</button>
+      <button class="tb toggle on" id="btn-force" title="显示活塞上蒸汽合力的方向与大小">推力箭头</button>
+      <button class="tb toggle on" id="btn-fx" title="烟、蒸汽等粒子效果">烟汽效果</button>
+      <button class="tb" id="btn-home" title="回到总览视角">⌂ 总览</button>
+    </nav>
   </header>
 
-  <!-- 左侧讲解面板 -->
-  <aside id="panel">
-    <div class="panel-tabs">
-      <button class="tab active" data-tab="how">工作原理</button>
-      <button class="tab" data-tab="parts">主要部件</button>
-      <button class="tab" data-tab="cycle">四个冲程</button>
+  <!-- 左侧：讲解 -->
+  <aside id="left" class="panel">
+    <div class="panel-head">
+      <div class="tabs">
+        <button class="tab active" data-tab="principle">原理</button>
+        <button class="tab" data-tab="parts">部件</button>
+        <button class="tab" data-tab="energy">能量</button>
+      </div>
+      <button class="collapse" data-target="left" title="收起">‹</button>
     </div>
-
     <div class="panel-body">
-      <section class="tab-content active" data-tab="how">
-        <h2>它如何产生推动力？</h2>
-        <p>蒸汽机把<b>燃料燃烧的热能</b>转化为<b>机械能</b>，核心是“高压蒸汽推动活塞”这一步。</p>
-        <ol>
-          <li><b>烧水产汽</b>：锅炉加热产生高温高压蒸汽。</li>
-          <li><b>蒸汽配气</b>：滑阀把蒸汽轮流送入气缸的左、右两端。</li>
-          <li><b>推动活塞</b>：高压蒸汽膨胀，推动活塞做<b>直线往复</b>运动——这就是动力的来源。</li>
-          <li><b>变成旋转</b>：连杆 + 曲柄把直线运动变成<b>旋转</b>运动。</li>
-          <li><b>飞轮稳速</b>：飞轮储存动能，越过死点、使转动平稳连续。</li>
+      <section class="tab-page active" data-tab="principle">
+        <div class="lead">
+          蒸汽机把<b>燃料的化学能</b>先变成<b>热</b>，再变成<b>高压蒸汽的压力能</b>，最后由活塞变成<b>机械功</b>。
+        </div>
+        <ol class="chain">
+          <li><span>煤燃烧</span><em>化学能 → 热</em></li>
+          <li><span>水沸腾成高压蒸汽</span><em>热 → 压力能</em></li>
+          <li><span>蒸汽推动活塞</span><em>压力 → 直线推力</em></li>
+          <li><span>曲柄连杆</span><em>往复 → 旋转</em></li>
         </ol>
-        <p class="tip">推动力本质：<b>F = 蒸汽压强 p × 活塞面积 A</b>。压强越高、活塞越大，推力越大。</p>
+
+        <article class="topic">
+          <h3>① 推力从哪里来</h3>
+          <p>活塞两侧的压力差乘以活塞面积，就是推力：</p>
+          <div class="formula">F = (p<sub>进汽侧</sub> − p<sub>排汽侧</sub>) × A</div>
+          <p>本机缸径 250 mm，A ≈ 0.049 m²。阀箱压力 6 bar、排汽 0.06 bar(表压) 时，推力约 <b>29 kN</b>——相当于 3 吨重物压在活塞上。右侧“推力”读数是实时计算值。</p>
+          <button class="goto" data-step="5">看活塞受力 →</button>
+        </article>
+
+        <article class="topic">
+          <h3>② 双作用：来回都做功</h3>
+          <p>蒸汽<b>交替</b>进入气缸两端：活塞向左时，右腔进汽做功、左腔排汽；向右时相反。每转两个做功冲程，比单作用机输出翻倍、转动也更均匀。</p>
+          <button class="goto" data-step="4">看滑阀如何换向 →</button>
+        </article>
+
+        <article class="topic">
+          <h3>③ 截汽与膨胀</h3>
+          <p>滑阀并不在整个行程都进汽：约在行程 <b id="txt-cutoff">80%</b> 处“截汽”，之后缸内蒸汽靠自身膨胀继续推活塞，压力按 <i>pV ≈ 常数</i> 下降。膨胀利用了蒸汽的弹性，节省蒸汽——示功图中的斜线段就是膨胀过程。</p>
+          <button class="goto" data-step="6">看示功图 →</button>
+        </article>
+
+        <article class="topic">
+          <h3>④ 直线变旋转，越过死点</h3>
+          <p>十字头-连杆-曲柄构成“曲柄滑块机构”。扭矩 = 连杆力 × 力臂；活塞在两端（死点）时力臂为零，推力再大也转不动——靠飞轮的惯性带过去。</p>
+          <button class="goto" data-step="8">看曲柄机构 →</button>
+        </article>
+
+        <article class="topic">
+          <h3>⑤ 自动调速（负反馈）</h3>
+          <p>负载变大 → 转速下降 → 飞球落下 → 节流阀开大 → 进汽增多 → 转速回升。瓦特的离心调速器是工业史上第一个广泛应用的反馈控制器。</p>
+          <button class="goto" data-step="11">动手试试 →</button>
+        </article>
+
+        <article class="topic">
+          <h3>⑥ 冷凝器：瓦特的关键改进</h3>
+          <p>把乏汽引入冷凝器冷却成水，形成真空，活塞背面的阻力从 1 bar 降到约 0.2 bar。蒸汽耗量可下降 10%~20%。</p>
+          <button class="goto" data-step="12">对比两种排汽 →</button>
+        </article>
       </section>
 
-      <section class="tab-content" data-tab="parts">
-        <h2>主要部件</h2>
-        <ul class="parts-list">
-          <li><span class="dot c-boiler"></span><b>锅炉</b>：燃料加热水，产生高压蒸汽。</li>
-          <li><span class="dot c-cyl"></span><b>气缸</b>：蒸汽在此膨胀做功的密闭空间。</li>
-          <li><span class="dot c-piston"></span><b>活塞</b>：被蒸汽推动，做直线往复运动。</li>
-          <li><span class="dot c-valve"></span><b>滑阀</b>：配气机构，控制蒸汽进出气缸两端。</li>
-          <li><span class="dot c-rod"></span><b>连杆</b>：连接活塞与曲柄，传递力。</li>
-          <li><span class="dot c-crank"></span><b>曲轴/曲柄</b>：把往复直线运动转成旋转。</li>
-          <li><span class="dot c-fly"></span><b>飞轮</b>：储能稳速，保证连续运转。</li>
-          <li><span class="dot" style="background:#d9a441"></span><b>偏心轮</b>：装在曲轴上，通过偏心杆驱动滑阀，实现自动配气。</li>
-          <li><span class="dot" style="background:#06d6a0"></span><b>离心调速器</b>：转快→飞球张开→关小进汽，自动稳定转速（瓦特反馈机构）。</li>
-        </ul>
-        <p class="tip">点击右下角“分解视图”可拉开部件，看清它们的连接关系。</p>
+      <section class="tab-page" data-tab="parts">
+        <p class="hint-s">点击部件名称或直接点击三维模型，可聚焦查看。</p>
+        <div id="part-list"></div>
       </section>
 
-      <section class="tab-content" data-tab="cycle">
-        <h2>双作用循环</h2>
-        <p>“双作用”指蒸汽<b>交替</b>推动活塞两端，往复都做功，效率更高。</p>
-        <ol>
-          <li><b>进汽</b>：滑阀打开一端，高压蒸汽进入。</li>
-          <li><b>膨胀做功</b>：蒸汽膨胀，推动活塞向另一端运动。</li>
-          <li><b>排汽</b>：活塞另一端的废汽经滑阀排出。</li>
-          <li><b>换向</b>：滑阀移动，进汽与排汽两端互换，反向推动。</li>
-        </ol>
-        <p class="tip">当前进汽侧会以<span style="color:#ff6b6b">红色高亮</span>显示，废汽以蓝色显示。</p>
+      <section class="tab-page" data-tab="energy">
+        <p class="hint-s">每秒的能量去向（实时）</p>
+        <canvas id="sankey" width="600" height="560"></canvas>
+        <div class="energy-notes">
+          <p><b>为什么效率这么低？</b> 蒸汽的大部分热量是<b>汽化潜热</b>（约 2000 kJ/kg），排汽时随乏汽一起被排走，发动机只能利用压力从 7 bar 降到排汽压力这一段的能量。</p>
+          <p>早期纽科门机效率不到 1%，瓦特机约 2%~4%，本机这类简单膨胀机 4%~8%；后来的多级膨胀、过热、冷凝机组可达 15%~20%，现代汽轮机电站约 40%。</p>
+        </div>
       </section>
     </div>
   </aside>
+  <button class="reopen" id="reopen-left" data-target="left">›</button>
 
-  <!-- 右下角控制台 -->
-  <div id="controls">
-    <button id="btn-play" class="ctrl">⏸ 暂停</button>
-    <div class="ctrl-row">
-      <label>转速</label>
-      <input id="speed" type="range" min="0" max="3" step="0.05" value="1" />
+  <!-- 右侧：仪表 -->
+  <aside id="right" class="panel">
+    <div class="panel-head">
+      <div class="panel-title">运行仪表</div>
+      <button class="collapse" data-target="right" title="收起">›</button>
     </div>
-    <button id="btn-steam" class="ctrl">🌫 蒸汽：开</button>
-    <button id="btn-explode" class="ctrl">🧩 分解视图</button>
-    <button id="btn-section" class="ctrl">🔪 剖切气缸</button>
-    <button id="btn-view" class="ctrl">🎥 复位视角</button>
-  </div>
+    <div class="panel-body">
+      <div class="readouts">
+        <div class="ro"><span>转速</span><b id="ro-rpm">0</b><i>r/min</i></div>
+        <div class="ro"><span>锅炉压力</span><b id="ro-pb">0</b><i>bar</i></div>
+        <div class="ro"><span>阀箱压力</span><b id="ro-pch">0</b><i>bar</i></div>
+        <div class="ro"><span>活塞推力</span><b id="ro-force">0</b><i>kN</i></div>
+        <div class="ro"><span>指示功率</span><b id="ro-ihp">0</b><i>kW</i></div>
+        <div class="ro"><span>输出功率</span><b id="ro-brake">0</b><i>kW</i></div>
+        <div class="ro"><span>蒸汽耗量</span><b id="ro-steam">0</b><i>kg/h</i></div>
+        <div class="ro"><span>热效率</span><b id="ro-eff">0</b><i>%</i></div>
+      </div>
+      <div class="stroke-state" id="stroke-state">—</div>
 
-  <!-- 右上角仪表 HUD -->
-  <div id="hud">
-    <canvas id="dial" width="150" height="150"></canvas>
-    <div class="hud-readout">
-      <div class="hud-row"><span>转速</span><b id="hud-rpm">0</b><i>r/min</i></div>
-      <div class="hud-row"><span>曲柄角</span><b id="hud-deg">0°</b></div>
-      <div class="hud-stroke" id="hud-stroke">— 已暂停 —</div>
-      <div class="hud-legend">
-        <span><i class="sw red"></i>进汽 / 做功侧</span>
-        <span><i class="sw blue"></i>排汽侧</span>
+      <div class="card">
+        <div class="card-h"><span>示功图 p–V</span><em id="ind-w"></em></div>
+        <canvas id="c-indicator" width="560" height="330"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-h"><span>配汽示意（剖面）</span><em id="valve-state"></em></div>
+        <canvas id="c-valve" width="560" height="300"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-h"><span>曲轴扭矩 / 一转</span><em id="tq-note"></em></div>
+        <canvas id="c-torque" width="560" height="240"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-h"><span>转速与节流阀（60 秒）</span></div>
+        <canvas id="c-trend" width="560" height="200"></canvas>
       </div>
     </div>
+  </aside>
+  <button class="reopen" id="reopen-right" data-target="right">‹</button>
+
+  <!-- 底部控制台 -->
+  <footer id="dock">
+    <div class="grp">
+      <button class="dk big" id="btn-run" title="打开/关闭主汽阀">■ 停车</button>
+      <button class="dk" id="btn-pause" title="暂停时间（空格）">⏸</button>
+    </div>
+    <div class="grp slider">
+      <label>时间倍率 <b id="lb-time">1×</b></label>
+      <input type="range" id="sl-time" min="0" max="100" value="100" />
+    </div>
+    <div class="grp slider">
+      <label>负载扭矩 <b id="lb-load">3800 N·m</b></label>
+      <input type="range" id="sl-load" min="0" max="6000" step="100" value="3800" />
+    </div>
+    <div class="grp slider">
+      <label>锅炉压力设定 <b id="lb-boiler">7.0 bar</b></label>
+      <input type="range" id="sl-boiler" min="2" max="8.5" step="0.1" value="7" />
+    </div>
+    <div class="grp slider">
+      <label><span class="chk"><input type="checkbox" id="ck-gov" checked /> 调速器自动</span> <b id="lb-thr">—</b></label>
+      <input type="range" id="sl-thr" min="0" max="100" value="60" disabled />
+    </div>
+    <div class="grp">
+      <button class="dk toggle" id="btn-cond" title="乏汽排入冷凝器（真空）或直接排大气">冷凝器：关</button>
+    </div>
+  </footer>
+
+  <!-- 导览卡片 -->
+  <div id="tour" class="hidden">
+    <div class="tour-top">
+      <span class="tour-step" id="tour-step">1 / 14</span>
+      <div class="tour-dots" id="tour-dots"></div>
+      <button class="tour-x" id="tour-exit" title="退出导览">✕</button>
+    </div>
+    <h2 id="tour-title"></h2>
+    <div class="tour-text" id="tour-text"></div>
+    <div class="tour-actions" id="tour-actions"></div>
+    <div class="tour-nav">
+      <button id="tour-prev">‹ 上一步</button>
+      <button id="tour-next" class="primary">下一步 ›</button>
+    </div>
   </div>
 
-  <!-- 浮动标签层 -->
-  <div id="labels"></div>
-
-  <!-- 部件信息提示 -->
-  <div id="hint">提示：拖动旋转 · 滚轮缩放 · 右键平移。把鼠标移到部件上可查看名称。</div>
+  <!-- 部件卡片 -->
+  <div id="partcard" class="hidden">
+    <button class="pc-x" id="pc-x">✕</button>
+    <div class="pc-cat" id="pc-cat"></div>
+    <h3 id="pc-name"></h3>
+    <p id="pc-desc"></p>
+    <div class="pc-btns">
+      <button id="pc-focus">聚焦视角</button>
+      <button id="pc-solo" class="toggle">只看它</button>
+    </div>
+  </div>
 
   <script type="importmap">
   {
     "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
+      "three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.7/build/index.module.js",
+      "three-bvh-csg": "https://cdn.jsdelivr.net/npm/three-bvh-csg@0.0.18/build/index.module.js"
     }
   }
   </script>
-  <script type="module" src="main.js"></script>
+  <script type="module" src="src/main.js"></script>
 </body>
 </html>
